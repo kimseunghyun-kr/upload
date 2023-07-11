@@ -66,14 +66,22 @@ public class ItemController {
     @GetMapping("/attach/{itemId}")
     public ResponseEntity<Resource> downloadAttach(@PathVariable Long itemId)
             throws MalformedURLException {
+//        find ID
         Item item = itemRepository.findById(itemId);
+//        get storefileName
         String storeFileName = item.getAttachFile().getStoreFileName();
+//        this is to get the userFileName
         String uploadFileName = item.getAttachFile().getUploadFileName();
+//        the file: prefix is to signal that the object uri is referring to a file within the local machine
         UrlResource resource = new UrlResource("file:" +
                 fileStore.getFullPath(storeFileName));
         log.info("uploadFileName={}", uploadFileName);
+
+//        this is to encode the uploadfilename from user by standardCHarset utf8 for kor support
         String encodedUploadFileName = UriUtils.encode(uploadFileName,
                 StandardCharsets.UTF_8);
+
+//        this is to allow the content to be treated as a attachment : downloadable file
         String contentDisposition = "attachment; filename=\"" +
                 encodedUploadFileName + "\"";
         return ResponseEntity.ok()
